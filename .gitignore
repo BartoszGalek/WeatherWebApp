@@ -1,0 +1,7 @@
+*.class
+*.log
+*.iml
+src/main/webapp/resources/bower_components/
+target/
+.idea
+.DS_Store

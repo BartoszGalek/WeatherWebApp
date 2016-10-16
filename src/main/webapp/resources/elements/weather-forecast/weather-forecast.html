@@ -1,0 +1,113 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="weather-forecast-day.html">
+
+<dom-module id="weather-forecast">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            span,
+            input {
+                @apply(--paper-font-body2);
+            }
+
+            .page-title {
+                padding: 1em;
+            }
+            .container {
+                display: flex;
+                flex: 1;
+                flex-wrap: wrap;
+            }
+            paper-material {
+                width: 100%;
+            }
+        </style>
+
+        <iron-ajax
+                id="request"
+                auto
+                url="{{_calculateUrl(city)}}"
+                handle-as="json"
+                on-response="handleResponse"
+                debounce-duration="1000"></iron-ajax>
+        <paper-material elevation="1">
+            <div class="container">
+                <template is="dom-if" if="[[weatherData]]">
+                    <template is="dom-repeat" items="{{weatherData}}">
+                        <weather-forecast-day weather-data="{{item}}"></weather-forecast-day>
+                    </template>
+                </template>
+            </div>
+        </paper-material>
+
+    </template>
+
+    <script>
+        (function () {
+            'use strict';
+
+            Polymer({
+                is: 'weather-forecast',
+
+                properties: {
+                    city: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    cityName: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    weatherData: {
+                        type: Array,
+                        value: [],
+                        notify: true
+                    },
+                    weatherDataStringified: {
+                        type: String
+                    }
+                },
+
+                _calculateUrl : function(city){
+                    return window.location.pathname + "/weather/"+city;
+                },
+
+                ready: function () {
+                    this.load();
+                },
+                loadCityWeather: function () {
+                    this.$.request.generateRequest();
+                },
+
+                load: function () {
+                    this.loadCityWeather();
+                },
+
+                handleResponse: function (response) {
+                    //respomse is valid
+                    response && response.detail && response.detail.response && response.detail.response.query && response.detail.response.query.count === 3 &&
+                    //(this.weatherData = response.detail.response.query.results.channel.map(function(item){return item.item.forecast;})) &&
+                    (this.weatherData = response.detail.response.query.results.channel) &&
+                    (this.weatherDataStringified=JSON.stringify(this.weatherData));
+                }
+            });
+        })();
+    </script>
+</dom-module>

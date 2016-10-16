@@ -1,0 +1,122 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+
+<dom-module id="weather-forecast-day">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: flex;
+                width: 20rem;
+                height: 30rem;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                align-content: space-around;
+                padding: 1rem;
+            }
+            body {
+                background-color: #e0f7fa;
+                color: #006064;
+            }
+            span,
+            input {
+                @apply(--paper-font-body2);
+            }
+            #weather-icon {
+                width: 200px;
+                height: 200px;
+            }
+        </style>
+        <div class="horizontal justified layout">
+            <h3 id="location">
+                Weather for
+                <span>[[_calculateLocationString(weatherData.location)]]</span>
+            </h3>
+        </div>
+
+
+
+        <div class="horizontal justified layout">
+            <h3 id="date">
+                on
+                <span>[[weatherData.item.forecast.date]]</span>
+            </h3>
+        </div>
+
+        <iron-icon icon="{{_calculateWeatherIcon(weatherData)}}" id="weather-icon">
+        </iron-icon>
+
+        <h2>
+            <span>[[weatherData.item.forecast.high]]</span>°
+            <span>F High</span>,
+            <span>[[weatherData.item.forecast.low]]</span>°
+            <span>F Low</span>,
+            <span>[[weatherData.item.forecast.text]]</span>
+        </h2>
+        <div class="horizontal justified layout">
+            <h5 id="update-time">
+                As of <span>[[weatherData.item.condition.date]]</span>
+            </h5>
+        </div>
+        <a href="https://www.yahoo.com/?ilc=401" target="_blank">
+            <img src="https://poweredby.yahoo.com/purple.png">
+        </a>
+    </template>
+
+    <script>
+        (function () {
+            'use strict';
+
+            Polymer({
+                is: 'weather-forecast-day',
+
+                properties: {
+                    weatherData: {
+                        type: Array,
+                        value: [],
+                        notify: true
+                    }
+                },
+
+                _calculateWeatherIcon: function (weatherData) {
+                    var code = weatherData.item.condition.code;
+                    if (code <= 12 || code >= 37) {
+                        return 'image:flash-on';
+                    }
+
+                    if (code <= 18) {
+                        return 'image:flare';
+                    }
+
+                    if (code <= 30) {
+                        return 'image:wb-cloudy';
+                    }
+
+                    return 'image:wb-sunny';
+                },
+
+                _calculateLocationString: function (location) {
+                    if (location.city && location.region) {
+                        return location.city + ', ' + location.region;
+                    }
+
+                    return location.city || 'Unknown';
+                }
+
+            });
+        })();
+    </script>
+</dom-module>
